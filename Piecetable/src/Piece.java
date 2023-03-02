@@ -11,6 +11,10 @@ public class Piece {
         this.offset = offset;
         this.length = length;
     }
+
+    public void setLength (int length, Piece p) {
+        this.length = length;
+    }
     public boolean isAdded() {
         return isAdded;
     }

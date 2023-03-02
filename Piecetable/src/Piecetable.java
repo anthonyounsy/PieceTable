@@ -37,13 +37,24 @@ public class PieceTable{
     }
 
     //TODO: Insert/Append text into piece Table
+    public void insert(int index, String text) {
+        int addIndex = 0;
+        for(Piece p: pieces) {
+            if(addIndex + p.length() >= index) {
+                int addOffSet = index - addIndex;
+                pieces.add(pieces.indexOf(p) + 1, new Piece(true, addedBuffer.length(), text.length()));
+                p.setLength(addOffSet, p);
+                break;
+            }
+            addIndex += p.length();
+        }
+        pieces.add(pieces.indexOf(pieces.get(pieces.size() - 1)) + 1, new Piece(true,originalBuffer.length(), text.length()));
+    }
 
 
 
 
     //TODO: Delete text from piece Table
-
-
     public void printPieces() {
         System.out.println("Piece Table Contents");
         System.out.println(" Source    Offset   Length");
@@ -57,7 +68,10 @@ public class PieceTable{
     }
 
     public static void main(String[] args) {
-        PieceTable pt = new PieceTable("Hello World");
+        PieceTable pt = new PieceTable("the quick brown fox\n" +  "jumped over the lazy dog");
+        pt.printPieces();
+        System.out.println(pt.getText());
+        pt.insert(11, "!");
         pt.printPieces();
         System.out.println(pt.getText());
     }
