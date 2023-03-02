@@ -36,7 +36,7 @@ public class PieceTable{
         return sb.toString();
     }
 
-    //TODO: Insert text into piece Table
+    //TODO: Insert/Append text into piece Table
 
 
 
@@ -46,9 +46,13 @@ public class PieceTable{
 
     public void printPieces() {
         System.out.println("Piece Table Contents");
-        System.out.println("---------------------");
+        System.out.println(" Source    Offset   Length");
+        System.out.println("----------------------------");
         for (Piece p: pieces) {
-            System.out.println("Pieces: " + p.getOriginalOrAppend() + " " + p.offset() + " " + p.length());
+            String source = p.getOriginalOrAppend();
+            String offset = String.format("%-6d", p.offset());
+            String length = String.format("%-6d", p.length());
+            System.out.println(String.format("  %-6s   %-6s   %-6s  ", source, offset, length));;
         }
     }
 
