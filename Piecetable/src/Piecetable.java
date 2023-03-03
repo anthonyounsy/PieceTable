@@ -113,10 +113,12 @@ public class PieceTable{
         }
         textLength += text.length();
     }
+    
+    //TODO: delete text from piecetable
 
 
 
-    //TODO: Delete text from piece Table
+    //TODO: print text from piecetable
     public void printPieces() {
         System.out.println("Piece Table Contents");
         System.out.println(" Source    Offset   Length");
