@@ -1,7 +1,6 @@
 package PieceTable;
 
 import java.util.ArrayList;
-import PieceTable.Piece;
 public class PieceTable{
     private String originalBuffer; //stores the original text buffer
     private int textLength; //stores the length of the text
@@ -17,11 +16,6 @@ public class PieceTable{
         this.pieces.add(new Piece(false, 0, originalBuffer.length()));
     }
 
-
-    //TODO: Returns the length of the text file
-    public int length(){
-        return this.textLength;
-    }
 
     //TODO: Get text from piece table
     public String getText() {
@@ -56,7 +50,9 @@ public class PieceTable{
         return sb.toString();
     }
 
-    //TODO: Insert/Append text into piece Table
+
+
+    //TODO: Insert/Append text into Piece Table
     public void insert(int index, String text) {
         if (index == 0) {
             // Inserting at the beginning of the document
@@ -167,7 +163,7 @@ public class PieceTable{
         pt.printPieces();
 
         // Test inserting at the end
-        pt.insert(pt.length(), "222");
+        pt.insert(pt.textLength, "222");
         System.out.println(pt.getText());
         pt.printPieces();
 
