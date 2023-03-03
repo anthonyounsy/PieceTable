@@ -1,5 +1,6 @@
 package piecetable;
 
+
 public class Piece {
     private boolean isAdded; //true if the piece is not from original text
     private int offset; //start of the piece in buffer
@@ -12,7 +13,7 @@ public class Piece {
         this.length = length;
     }
 
-    public void setLength (int length, Piece p) {
+    public void setLength (int length) {
         this.length = length;
     }
     public boolean isAdded() {
@@ -35,4 +36,7 @@ public class Piece {
         }
     }
 
+    public void setOffset(int index) {
+        this.offset = index;
+    }
 }
