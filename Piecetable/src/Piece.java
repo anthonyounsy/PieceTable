@@ -1,4 +1,4 @@
-package piecetable;
+package PieceTable;
 
 
 public class Piece {

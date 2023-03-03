@@ -1,7 +1,7 @@
-package piecetable;
+package PieceTable;
 
 import java.util.ArrayList;
-import piecetable.Piece;
+import PieceTable.Piece;
 public class PieceTable{
     private String originalBuffer; //stores the original text buffer
     private int textLength; //stores the length of the text
