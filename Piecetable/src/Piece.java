@@ -39,4 +39,12 @@ public class Piece {
     public void setOffset(int index) {
         this.offset = index;
     }
+    
+      public Piece[] splitPiece(Piece PrevPiece, int splitOffset) {
+    	
+        PrevPiece.setLength(splitOffset); 
+       Piece newPiece = new Piece(true, splitOffset, length);
+       Piece[] split = {PrevPiece, newPiece};
+       return split;
+    }
 }
