@@ -1,25 +1,25 @@
-package PieceTable;
 
+import java.util.Arrays;
 import java.util.ArrayList;
 
 public class PieceTable {
-	private String originalBuffer; // stores the original text buffer
+	private String sequenceBuffer; //stores the Sequence
 	private int SequenceLength; // stores the length of the text
-	private String addedBuffer; // stores the added text buffer
+	//private String sequenceBuffer; // stores the added text buffer
 	private ArrayList<Piece> pieces; // stores the pieces of the text
 
 	// Constructor
-	public PieceTable(String originalBuffer) {
-		this.originalBuffer = originalBuffer;
-		this.SequenceLength = originalBuffer.length();
-		this.addedBuffer = ""; // initialize as empty
+	public PieceTable(String sequenceBuffer) {
+		this.sequenceBuffer = sequenceBuffer;
+		this.SequenceLength = sequenceBuffer.length();
+		//this.sequenceBuffer = ""; // initialize as empty
 		this.pieces = new ArrayList<>();
-		this.pieces.add(new Piece(false, 0, originalBuffer.length()));
+		this.pieces.add(new Piece(0, sequenceBuffer.length()));
 	}
 
 	public void addText(String text) {
-		addedBuffer += text;
-		Piece newPiece = new Piece(true, SequenceLength, text.length());
+		sequenceBuffer += text;
+		Piece newPiece = new Piece(SequenceLength, text.length());
 		pieces.add(newPiece);
 		SequenceLength += text.length();
 		for (int i = pieces.indexOf(newPiece) + 1; i < pieces.size(); i++) {
@@ -38,29 +38,30 @@ public class PieceTable {
 		}
 		if (newIndex == 0) {
 			// Inserting at the beginning of the document
-			pieces.add(0, new Piece(true, 0, newText.length()));
+			pieces.add(0, new Piece( 0, newText.length()));
 			SequenceLength += newText.length();
-			addedBuffer += newText;
-			// Adjust the offset of the existing pieces
-			for (int i = 1; i < pieces.size(); i++) {
-				pieces.get(i).setOffset(pieces.get(i).offset() + newText.length());
-			}
-		} else {
-			// Find the piece that contains the index
+			sequenceBuffer = newText + sequenceBuffer;
+		} 
+		else {
+			//Find the piece that contains the index
 			Piece piece = findPiece(newIndex);
-			int splitIndex = newIndex - piece.offset();
-			Piece[] splitPieces = piece.splitPiece(splitIndex);
-			Piece newPiece = new Piece(true, SequenceLength, newText.length());
-			addedBuffer += newText;
-			pieces.add(pieces.indexOf(piece), splitPieces[0]);
-			pieces.add(pieces.indexOf(piece) + 1, newPiece);
-			pieces.add(pieces.indexOf(piece) + 2, splitPieces[1]);
+	        int splitIndex = newIndex - piece.offset();
+	        if(splitIndex > 0 && splitIndex < piece.length()) {
+	        	//Update the piece the split pieces at its index
+				Piece[] splitPieces = piece.splitPiece(splitIndex);			
+				Piece p1 = splitPieces[0];
+				Piece p2 = splitPieces[1];
+				System.out.println("offset: "  + p1.offset() +   "length: " + p1.length());
+				System.out.println("offset: "  + p2.offset() +   "length: " + p2.length());
+				piece = splitPieces[0];
+				pieces.add(pieces.indexOf(piece) + 1, splitPieces[1]);
 
-			// Update the offset of the pieces after the inserted text
-			for (int i = pieces.indexOf(newPiece) + 1; i < pieces.size(); i++) {
-				Piece p = pieces.get(i);
-				p.setOffset(p.offset() + newText.length());
-			}
+				pieces.add(new Piece(0, newText.length()));
+				sequenceBuffer += newText;
+				SequenceLength += newText.length();
+				
+				Piece newPiece = new Piece(SequenceLength, newText.length());
+	        }
 		}
 	}
 
@@ -72,85 +73,137 @@ public class PieceTable {
 		}
 		return null;
 	}
-
+	
 	public String getText() {
 		StringBuilder sb = new StringBuilder();
+		int runningTotalLength = 0;
 		for (Piece piece : pieces) {
-			if (piece.isAdded()) {
-				int addedBufferOffset = piece.offset() - SequenceLength;
-				if (addedBufferOffset < 0) {
-					addedBufferOffset = 0;
+				if(pieces.indexOf(piece) == 0) {
+					sb.append(sequenceBuffer.substring(piece.offset(), piece.length()));
+					runningTotalLength += piece.length();
 				}
-				sb.append(addedBuffer.substring(addedBufferOffset, addedBufferOffset + piece.length()));
-			} else {
-				sb.append(originalBuffer.substring(piece.offset(), piece.offset() + piece.length()));
-			}
+				else{
+					sb.append(sequenceBuffer.substring(runningTotalLength, piece.length() + runningTotalLength));
+					runningTotalLength += piece.length();
+				}
+
 		}
 		return sb.toString();
 	}
-    
+	
     //TODO: delete text from piecetable
-
-
-
-    //TODO: print text from piecetable
-    public void printPieces() {
-        System.out.println("Piece Table Contents");
-        System.out.println(" Source    Offset   Length");
-        System.out.println("----------------------------");
-        for (Piece p: pieces) {
-            String source = p.getOriginalOrAppend();
-            String offset = String.format("%-6d", p.offset());
-            String length = String.format("%-6d", p.length());
-            String text = "";
-            if (p.isAdded()) {
-                int start = p.offset();
-                int end = start + p.length();
-                if (start >= addedBuffer.length()) {
-                    // The piece is outside the bounds of the added buffer
-                    continue;
-                }
-                if (end > addedBuffer.length()) {
-                    // The piece goes beyond the end of the added buffer
-                    end = addedBuffer.length();
-                }
-                text = addedBuffer.substring(start, end);
-            } else {
-                int start = p.offset();
-                int end = start + p.length();
-                if (start >= originalBuffer.length()) {
-                    // The piece is outside the bounds of the original buffer
-                    continue;
-                }
-                if (end > originalBuffer.length()) {
-                    // The piece goes beyond the end of the original buffer
-                    end = originalBuffer.length();
-                }
-                text = originalBuffer.substring(start, end);
-            }
-            System.out.printf("  %-6s   %-6d   %-6d  %s%n", source, p.offset(), p.length(), text);
-        }
+    public void delete(int index, int deletionLength)
+    {
+    	//Quick Cases (delete nothing, delete backwards, out of bounds...):
+    	if (deletionLength == 0)
+    		return;
+    	if (deletionLength < 0)
+    		delete(index - deletionLength, -deletionLength);
+    	if (index < 0)
+    		throw new OutOfBoundsError("Index out of range");
+    	
+    	Piece specialPiece; //in case of node removal to avoid error.
+    	boolean deleteMultiple = false;
+    	int deleteIndex = 0; //starting character index of each individual piece
+    	
+    	for (Piece currentPiece : pieces)
+    	{
+    		int deleteOffset = deleteIndex - index; //offset within currentPiece.
+    		if(deleteIndex + currentPiece.length() >= index) //when you find the correct piece.
+    		{
+    			if(currentPiece.length() == deletionLength && deleteOffset == 0) //CASE: single whole piece to be deleted
+    			{
+    				specialPiece = currentPiece;
+    				break; //remove outside of the loop to avoid concurrent modification error;
+    			}
+    			
+    			else if(deletionLength < currentPiece.length() - deleteIndex)//CASE: Single Piece modification
+    			{
+    				if(deleteOffset == 0) //If delete starts at the beginning
+    				{
+    					currentPiece.setLength(currentPiece.length() - deletionLength);
+    					currentPiece.setOffset(currentPiece.offset() + deletionLength);
+    				}
+    				else if(deletionLength == currentPiece.length() - deleteOffset) //Deleting from the end of a single piece
+    				{
+    					currentPiece.setLength(currentPiece.length() - deletionLength);
+    				}
+    				
+    				else //CASE: split one single array
+    				{
+    					Piece[] splitArray = currentPiece.splitPiece(currentPiece, deleteOffset);
+    					pieces.set(pieces.indexOf(currentPiece), splitArray[0]);
+    					pieces.add(pieces.indexOf(currentPiece) + 1, splitArray[1]);
+    				}
+    			}
+    		}
+    		deleteIndex += currentPiece.length(); //keep deleteIndex updated
+    	}
+    	if(specialPiece != null) { pieces.remove(specialPiece) };
+    	
+    	
+    	SequenceLength -= deletionLength;
     }
 
 
-    public static void main(String[] args) {
-        PieceTable pt = new PieceTable("the quick brown fox" +  "jumped over the lazy dog");
+	// TODO: print text from piecetable
+	public void printPieces() {
+		System.out.println("Piece Table Contents");
+		System.out.println("Offset   Length");
+		System.out.println("----------------------------");
+		for (Piece p : pieces) {
+			String text = "";
+				int start = p.offset();
+				int end = start + p.length();
+				if (start >= sequenceBuffer.length()) {
+					// The piece is outside the bounds of the added buffer
+					continue;
+				}
+				if (end > sequenceBuffer.length()) {
+					// The piece goes beyond the end of the added buffer
+					end = sequenceBuffer.length();
+			} 
+				if (start >= sequenceBuffer.length()) {
+					// The piece is outside the bounds of the original buffer
+					continue;
+				}
+				if (end > sequenceBuffer.length()) {
+					// The piece goes beyond the end of the original buffer
+					end = sequenceBuffer.length();
+				}
+				text = sequenceBuffer.substring(start, end);
+			System.out.printf("   %-6d   %-6d  %s%n", p.offset(), p.length(), text);
+		}
+	}
+	
+	public String getSequence() {
+		return (this.sequenceBuffer + " Length: " + this.SequenceLength);
+	}
+	
+	
 
-        // Test inserting at the beginning
-        pt.insert(0, "111");
-        System.out.println(pt.getText());
-        pt.printPieces();
+	public static void main(String[] args) {
+		//PieceTable pt = new PieceTable("the quick brown fox" + "jumped over the lazy dog");
+		PieceTable pt = new PieceTable("Hello World");
+		
+		// Test inserting at the beginning
+		//pt.insert(0, "111");
+		//System.out.println(pt.getText());
+		//pt.printPieces();
+		System.out.println(pt.getSequence());
 
-        // Test inserting at the end
-        pt.insert(pt.textLength, "222");
-        System.out.println(pt.getText());
-        pt.printPieces();
+		// Test inserting at the end
+		//pt.insert(pt.SequenceLength, "222");
+		//System.out.println(pt.getText());
+		//pt.printPieces();
 
-        // Test inserting multiple times
-        pt.insert(6, "333");
-        pt.insert(22, "444");
-        System.out.println(pt.getText());
-        pt.printPieces();
-        System.out.println(pt.getText());
-    }
+		// Test inserting multiple times
+		pt.insert(5, " Everyone");
+		//pt.insert(22, "444");
+		//System.out.println(pt.getText());
+		pt.printPieces();
+		System.out.println(pt.getSequence());
+		//System.out.println(pt.getText());
+	
+	}
 }
