@@ -1,114 +1,93 @@
 package PieceTable;
 
 import java.util.ArrayList;
-public class PieceTable{
-    private String originalBuffer; //stores the original text buffer
-    private int textLength; //stores the length of the text
-    private String addedBuffer; //stores the added text buffer
-    private ArrayList<Piece> pieces; //stores the pieces of the text
 
-    //Constructor
-    public PieceTable(String originalBuffer){
-        this.originalBuffer = originalBuffer;
-        this.textLength = originalBuffer.length();
-        this.addedBuffer = ""; // initialize as empty
-        this.pieces = new ArrayList<>();
-        this.pieces.add(new Piece(false, 0, originalBuffer.length()));
-    }
+public class PieceTable {
+	private String originalBuffer; // stores the original text buffer
+	private int SequenceLength; // stores the length of the text
+	private String addedBuffer; // stores the added text buffer
+	private ArrayList<Piece> pieces; // stores the pieces of the text
 
+	// Constructor
+	public PieceTable(String originalBuffer) {
+		this.originalBuffer = originalBuffer;
+		this.SequenceLength = originalBuffer.length();
+		this.addedBuffer = ""; // initialize as empty
+		this.pieces = new ArrayList<>();
+		this.pieces.add(new Piece(false, 0, originalBuffer.length()));
+	}
 
-    //TODO: Get text from piece table
-    public String getText() {
-        StringBuilder sb = new StringBuilder();
-        for (Piece p: pieces) {
-            if (p.isAdded()) {
-                int start = p.offset();
-                int end = start + p.length();
-                if (start >= addedBuffer.length()) {
-                    // The piece is outside the bounds of the added buffer
-                    continue;
-                }
-                if (end > addedBuffer.length()) {
-                    // The piece goes beyond the end of the added buffer
-                    end = addedBuffer.length();
-                }
-                sb.append(addedBuffer.substring(start, end));
-            } else {
-                int start = p.offset();
-                int end = start + p.length();
-                if (start >= originalBuffer.length()) {
-                    // The piece is outside the bounds of the original buffer
-                    continue;
-                }
-                if (end > originalBuffer.length()) {
-                    // The piece goes beyond the end of the original buffer
-                    end = originalBuffer.length();
-                }
-                sb.append(originalBuffer.substring(start, end));
-            }
-        }
-        return sb.toString();
-    }
+	public void addText(String text) {
+		addedBuffer += text;
+		Piece newPiece = new Piece(true, SequenceLength, text.length());
+		pieces.add(newPiece);
+		SequenceLength += text.length();
+		for (int i = pieces.indexOf(newPiece) + 1; i < pieces.size(); i++) {
+			Piece piece = pieces.get(i);
+			piece.setOffset(piece.offset() + text.length());
+		}
+	}
 
+	public void insert(int newIndex, String newText) {
+		if (newIndex > SequenceLength) {
+			throw new IndexOutOfBoundsException("Index is out of bounds");
+		}
+		// Add at end of document
+		if (newIndex == SequenceLength) {
+			addText(newText);
+		}
+		if (newIndex == 0) {
+			// Inserting at the beginning of the document
+			pieces.add(0, new Piece(true, 0, newText.length()));
+			SequenceLength += newText.length();
+			addedBuffer += newText;
+			// Adjust the offset of the existing pieces
+			for (int i = 1; i < pieces.size(); i++) {
+				pieces.get(i).setOffset(pieces.get(i).offset() + newText.length());
+			}
+		} else {
+			// Find the piece that contains the index
+			Piece piece = findPiece(newIndex);
+			int splitIndex = newIndex - piece.offset();
+			Piece[] splitPieces = piece.splitPiece(splitIndex);
+			Piece newPiece = new Piece(true, SequenceLength, newText.length());
+			addedBuffer += newText;
+			pieces.add(pieces.indexOf(piece), splitPieces[0]);
+			pieces.add(pieces.indexOf(piece) + 1, newPiece);
+			pieces.add(pieces.indexOf(piece) + 2, splitPieces[1]);
 
+			// Update the offset of the pieces after the inserted text
+			for (int i = pieces.indexOf(newPiece) + 1; i < pieces.size(); i++) {
+				Piece p = pieces.get(i);
+				p.setOffset(p.offset() + newText.length());
+			}
+		}
+	}
 
-    //TODO: Insert/Append text into Piece Table
-    public void insert(int index, String text) {
-        if (index == 0) {
-            // Inserting at the beginning of the document
-            pieces.add(0, new Piece(true, 0, text.length()));
-            addedBuffer = text + addedBuffer;
-            // Adjust the offset of the existing pieces
-            for (int i = 1; i < pieces.size(); i++) {
-                pieces.get(i).setOffset(pieces.get(i).offset() + text.length());
-            }
-        } else {
-            int addIndex = 0;
-            for (Piece p: pieces) {
-                if (addIndex + p.length() >= index) {
-                    int addOffset = index - addIndex;
-                    int existingPieceIndex = pieces.indexOf(p);
-                    Piece existingPiece = pieces.get(existingPieceIndex);
-                    int existingPieceOffset = existingPiece.offset();
-                    int existingPieceLength = existingPiece.length();
-                    if (addOffset == existingPieceLength && existingPiece.isAdded()) {
-                        // If the piece points to the end of the added buffer and we are inserting at its end,
-                        // simply increase its length
-                        existingPiece.setLength(existingPieceLength + text.length());
-                        addedBuffer = addedBuffer.substring(0, addedBuffer.length() - existingPieceLength) + text;
-                    } else {
-                        Piece newPiece = new Piece(true, addedBuffer.length(), text.length());
-                        int newPieceIndex = existingPieceIndex + 1;
-                        if (addOffset == 0) {
-                            // If the insert is at the beginning of the piece, just add the new piece before the existing piece
-                            pieces.add(newPieceIndex, newPiece);
-                            // Adjust the length and offset of the existing piece
-                            existingPiece.setLength(existingPieceLength - text.length());
-                            existingPiece.setOffset(existingPieceOffset + text.length());
-                        } else if (addOffset == existingPieceLength) {
-                            // If the insert is at the end of the piece, just add the new piece after the existing piece
-                            pieces.add(newPieceIndex, newPiece);
-                            // Adjust the length of the existing piece
-                            existingPiece.setLength(existingPieceLength - text.length());
-                        } else {
-                            // If the insert is in the middle of the piece, split the piece into two pieces
-                            Piece before = new Piece(existingPiece.isAdded(), existingPieceOffset, addOffset);
-                            Piece after = new Piece(existingPiece.isAdded(), existingPieceOffset + addOffset + text.length(), existingPieceLength - addOffset);
-                            pieces.set(existingPieceIndex, before);
-                            pieces.add(newPieceIndex, newPiece);
-                            pieces.add(newPieceIndex + 1, after);
-                            // Adjust the length of the existing piece
-                            existingPiece.setLength(addOffset);
-                        }
-                        addedBuffer += text;
-                    }
-                    break;
-                }
-                addIndex += p.length();
-            }
-        }
-        textLength += text.length();
-    }
+	private Piece findPiece(int index) {
+		for (Piece piece : pieces) {
+			if (index >= piece.offset() && index < piece.offset() + piece.length()) {
+				return piece;
+			}
+		}
+		return null;
+	}
+
+	public String getText() {
+		StringBuilder sb = new StringBuilder();
+		for (Piece piece : pieces) {
+			if (piece.isAdded()) {
+				int addedBufferOffset = piece.offset() - SequenceLength;
+				if (addedBufferOffset < 0) {
+					addedBufferOffset = 0;
+				}
+				sb.append(addedBuffer.substring(addedBufferOffset, addedBufferOffset + piece.length()));
+			} else {
+				sb.append(originalBuffer.substring(piece.offset(), piece.offset() + piece.length()));
+			}
+		}
+		return sb.toString();
+	}
     
     //TODO: delete text from piecetable
 
