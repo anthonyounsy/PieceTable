@@ -131,7 +131,7 @@ public class PieceTable {
     				
     				else //CASE: split one single array
     				{
-    					Piece[] splitArray = currentPiece.splitPiece(currentPiece, deleteOffset);
+    					Piece[] splitArray = currentPiece.splitPiece(deleteOffset);
     					pieces.set(pieces.indexOf(currentPiece), splitArray[0]);
     					pieces.add(pieces.indexOf(currentPiece) + 1, splitArray[1]);
     				}
