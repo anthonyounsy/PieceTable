@@ -17,31 +17,22 @@ public class PieceTable {
 		this.pieces.add(new Piece(0, sequenceBuffer.length()));
 	}
 
-	public void addText(String text) {
-		sequenceBuffer += text;
-		Piece newPiece = new Piece(SequenceLength, text.length());
-		pieces.add(newPiece);
-		SequenceLength += text.length();
-		for (int i = pieces.indexOf(newPiece) + 1; i < pieces.size(); i++) {
-			Piece piece = pieces.get(i);
-			piece.setOffset(piece.offset() + text.length());
-		}
-	}
-
 	public void insert(int newIndex, String newText) {
 		if (newIndex > SequenceLength) {
 			throw new IndexOutOfBoundsException("Index is out of bounds");
-		}
-		// Add at end of document
-		if (newIndex == SequenceLength) {
-			addText(newText);
 		}
 		if (newIndex == 0) {
 			// Inserting at the beginning of the document
 			pieces.add(0, new Piece( 0, newText.length()));
 			SequenceLength += newText.length();
 			sequenceBuffer = newText + sequenceBuffer;
-		} 
+		}
+		if(newIndex == SequenceLength) {
+			//Insert at the end of the file
+			pieces.add(new Piece(SequenceLength, newText.length()));
+			sequenceBuffer += newText;
+			SequenceLength += newText.length();
+		}
 		else {
 			//Find the piece that contains the index
 			Piece piece = findPiece(newIndex);
@@ -58,8 +49,7 @@ public class PieceTable {
 
 				pieces.add(new Piece(0, newText.length()));
 				sequenceBuffer += newText;
-				SequenceLength += newText.length();
-				
+				SequenceLength += newText.length();				
 				Piece newPiece = new Piece(SequenceLength, newText.length());
 	        }
 		}
@@ -89,62 +79,66 @@ public class PieceTable {
 
 		}
 		return sb.toString();
+		
 	}
 	
-    //TODO: delete text from piecetable
-    public void delete(int index, int deletionLength)
-    {
-    	//Quick Cases (delete nothing, delete backwards, out of bounds...):
-    	if (deletionLength == 0)
-    		return;
-    	if (deletionLength < 0)
-    		delete(index - deletionLength, -deletionLength);
-    	if (index < 0)
-    		throw new OutOfBoundsError("Index out of range");
-    	
-    	Piece specialPiece; //in case of node removal to avoid error.
-    	boolean deleteMultiple = false;
-    	int deleteIndex = 0; //starting character index of each individual piece
-    	
-    	for (Piece currentPiece : pieces)
-    	{
-    		int deleteOffset = deleteIndex - index; //offset within currentPiece.
-    		if(deleteIndex + currentPiece.length() >= index) //when you find the correct piece.
-    		{
-    			if(currentPiece.length() == deletionLength && deleteOffset == 0) //CASE: single whole piece to be deleted
-    			{
-    				specialPiece = currentPiece;
-    				break; //remove outside of the loop to avoid concurrent modification error;
-    			}
-    			
-    			else if(deletionLength < currentPiece.length() - deleteIndex)//CASE: Single Piece modification
-    			{
-    				if(deleteOffset == 0) //If delete starts at the beginning
-    				{
-    					currentPiece.setLength(currentPiece.length() - deletionLength);
-    					currentPiece.setOffset(currentPiece.offset() + deletionLength);
-    				}
-    				else if(deletionLength == currentPiece.length() - deleteOffset) //Deleting from the end of a single piece
-    				{
-    					currentPiece.setLength(currentPiece.length() - deletionLength);
-    				}
-    				
-    				else //CASE: split one single array
-    				{
-    					Piece[] splitArray = currentPiece.splitPiece(deleteOffset);
-    					pieces.set(pieces.indexOf(currentPiece), splitArray[0]);
-    					pieces.add(pieces.indexOf(currentPiece) + 1, splitArray[1]);
-    				}
-    			}
-    		}
-    		deleteIndex += currentPiece.length(); //keep deleteIndex updated
-    	}
-    	if(specialPiece != null) { pieces.remove(specialPiece) };
-    	
-    	
-    	SequenceLength -= deletionLength;
-    }
+	  public void delete(int index, int deletionLength){ 
+	    {
+	  
+	    	//Quick Cases (delete nothing, delete backwards, out of bounds...):
+	    	if (deletionLength == 0)
+	    		return;
+	    	if (deletionLength < 0)
+	    		delete(index - deletionLength, -deletionLength);
+	    	if (index < 0)
+	    		throw new IndexOutOfBoundsException("Index out of range");
+	    	
+	    	Piece specialPiece; //in case of node removal to avoid error.
+	    	boolean deleteMultiple = false;
+	    	int deleteIndex = 0; //starting character index of each individual piece
+	    	
+	    	for (Piece currentPiece : pieces)
+	    	{
+	    		int deleteOffset = deleteIndex - index; //offset within currentPiece.
+	    		if(deleteIndex + currentPiece.length() >= index) //when you find the correct piece.
+	    		{
+	    			if(currentPiece.length() == deletionLength && deleteOffset == 0) //CASE: single whole piece to be deleted
+	    			{
+	    				specialPiece = currentPiece;
+	    				break; //remove outside of the loop to avoid concurrent modification error;
+	    			}
+	    			
+	    			else if(deletionLength < currentPiece.length() - deleteIndex)//CASE: Single Piece modification
+	    			{
+	    				if(deleteOffset == 0) //If delete starts at the beginning
+	    				{
+	    					currentPiece.setLength(currentPiece.length() - deletionLength);
+	    					currentPiece.setOffset(currentPiece.offset() + deletionLength);
+	    				}
+	    				else if(deletionLength == currentPiece.length() - deleteOffset) //Deleting from the end of a single piece
+	    				{
+	    					currentPiece.setLength(currentPiece.length() - deletionLength);
+	    				}
+	    				
+	    				else //CASE: split one single array
+	    				{
+	    					Piece[] splitArray = currentPiece.splitPiece(deleteOffset);
+	    					pieces.set(pieces.indexOf(currentPiece), splitArray[0]);
+	    					pieces.add(pieces.indexOf(currentPiece) + 1, splitArray[1]);
+	    				}
+	    			}
+	    		}
+	    		deleteIndex += currentPiece.length(); //keep deleteIndex updated
+	    	}
+	    	if(specialPiece != null) { pieces.remove(specialPiece) };
+	    	
+	    	SequenceLength -= deletionLength;
+	    }
+	  }
 
+
+	
+  
 
 	// TODO: print text from piecetable
 	public void printPieces() {
