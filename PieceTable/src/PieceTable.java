@@ -46,6 +46,9 @@ public class PieceTable {
 				System.out.println("offset: "  + p2.offset() +   "length: " + p2.length());
 				piece = splitPieces[0];
 				pieces.add(pieces.indexOf(piece) + 1, splitPieces[1]);
+				sequenceBuffer += newText;
+				SequenceLength += newText.length();				
+				Piece newPiece = new Piece(SequenceLength, newText.length());
 
 	        	}
 		}
