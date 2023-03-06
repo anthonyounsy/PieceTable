@@ -38,7 +38,7 @@ public class PieceTable {
 			//Find the piece that contains the index
 			Piece piece = findPiece(newIndex);
 			//if the new piece is inserted at the end of an existing node
-			if(piece.length() == newText.length()) {
+			if(piece.length() == newIndex) {
 				pieces.add(new Piece(SequenceLength, newText.length()));
 				SequenceLength += newText.length();
 				sequenceBuffer += newText;
