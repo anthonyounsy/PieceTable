@@ -33,24 +33,34 @@ public class PieceTable {
 			sequenceBuffer += newText;
 			SequenceLength += newText.length();
 		}
+		
 		else {
 			//Find the piece that contains the index
 			Piece piece = findPiece(newIndex);
+			//if the new piece is inserted at the end of an existing node
+			if(piece.length() == newText.length()) {
+				pieces.add(new Piece(SequenceLength, newText.length()));
+				SequenceLength += newText.length();
+				sequenceBuffer += newText;
+			}
 	        int splitIndex = newIndex - piece.offset();
 	        if(splitIndex > 0 && splitIndex < piece.length()) {
-	        	//Update the piece the split pieces at its index
+	        	//Update the piece by splitting the pieces at its index
 				Piece[] splitPieces = piece.splitPiece(splitIndex);			
 				Piece p1 = splitPieces[0];
 				Piece p2 = splitPieces[1];
 				System.out.println("offset: "  + p1.offset() +   "length: " + p1.length());
 				System.out.println("offset: "  + p2.offset() +   "length: " + p2.length());
+				//update current piece
 				piece = splitPieces[0];
+				//update split node
 				pieces.add(pieces.indexOf(piece) + 1, splitPieces[1]);
+				//insert new piece
+				pieces.add(new Piece(SequenceLength, newText.length()));
+				SequenceLength += newText.length();
 				sequenceBuffer += newText;
-				SequenceLength += newText.length();				
-				Piece newPiece = new Piece(SequenceLength, newText.length());
 
-	        	}
+	        }
 		}
 	}
 
@@ -125,15 +135,24 @@ public class PieceTable {
 	    					pieces.set(pieces.indexOf(currentPiece), splitArray[0]);
 	    					pieces.add(pieces.indexOf(currentPiece) + 1, splitArray[1]);
 	    				}
+	        		
+	    			deleteIndex += currentPiece.length(); //keep deleteIndex updated
 	    			}
-	    		}
-	    		deleteIndex += currentPiece.length(); //keep deleteIndex updated
+	    			
+	    		
+	    		
 	    	}
-	    	if(specialPiece != null) { pieces.remove(specialPiece) };
-	    	
-	    	SequenceLength -= deletionLength;
+	    	//if(specialPiece != null) { pieces.remove(specialPiece); }
+			SequenceLength -= deletionLength;}
 	    }
 	  }
+
+	  
+
+	    
+
+
+
 
 
 	
