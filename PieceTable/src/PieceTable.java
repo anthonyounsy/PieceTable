@@ -47,11 +47,7 @@ public class PieceTable {
 				piece = splitPieces[0];
 				pieces.add(pieces.indexOf(piece) + 1, splitPieces[1]);
 
-				pieces.add(new Piece(0, newText.length()));
-				sequenceBuffer += newText;
-				SequenceLength += newText.length();				
-				Piece newPiece = new Piece(SequenceLength, newText.length());
-	        }
+	        	}
 		}
 	}
 
