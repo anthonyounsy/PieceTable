@@ -124,6 +124,7 @@ public class PieceTable {
               Piece[] startEdgeSplit = startEdge.splitPiece(deleteOffset - deletionLength);
               pieces.add(savedIndex, startEdgeSplit[0]);
           }
+	}
 
 
 	// TODO: print text from piecetable
