@@ -22,7 +22,6 @@ public class PieceTableTest {
     	PieceTable table= new PieceTable("Hello, world!");
     	table.insert(6, "everyone  ");
     	assertEquals("Hello,everyone   world!",table.getText());
-    			
     }
     @Test
     public void testDelete() {
@@ -43,13 +42,8 @@ public class PieceTableTest {
     	table.delete(0, 6);
     	assertEquals(" world",table.getText());
     }
-    
-    @Test
-    public void testDeleteEntirePiece() {
-    	PieceTable table = new PieceTable("Hello, world!");
-        table.delete(6,5);
-        assertEquals("Hello,d!",table.getText());
-    }
+
+ 
     
     @Test
      public void testGet() {
@@ -67,8 +61,8 @@ public class PieceTableTest {
     @Test
     public void testInsertAndDelete() {
         PieceTable table = new PieceTable("Hello, world!");
-        table.insert(8, "everyone ");
-        table.delete(5,6);
+        table.insert(6, "everyone");
+        table.delete(0,6);
         assertEquals("everyone world!", table.getText());
     }
 
@@ -76,8 +70,18 @@ public class PieceTableTest {
     public void testInsertAtBeginning() {
     	PieceTable table= new PieceTable("world!");
     	table.insert(0, "Hello, ");
+    	System.out.println(table.getSequence()); 
     	assertEquals("Hello, world!", table.getText());
-    }
+
+    	}
+
+
+	@Test
+	public void testDeleteEntirePiece() {
+		PieceTable table = new PieceTable("Hello, world!");
+	    table.delete(6,5);
+	    assertEquals("Hello,d!",table.getText());
+	}
     
    
 }
