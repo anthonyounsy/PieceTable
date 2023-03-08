@@ -29,7 +29,7 @@ public class PieceTable {
 		}
 		if(newIndex == SequenceLength) {
 			//Insert at the end of the file
-			pieces.add(new Piece(SequenceLength, newText.length()-1));
+			pieces.add(new Piece(SequenceLength, newText.length()));
 			sequenceBuffer += newText;
 			SequenceLength += newText.length();
 		}
@@ -54,7 +54,7 @@ public class PieceTable {
 				//update current piece
 				piece.setPiece(splitPieces[0]);
 				//update split node
-				pieces.add(pieces.indexOf(piece)+1, new Piece(SequenceLength, newText.length()-2));
+				pieces.add(pieces.indexOf(piece)+1, new Piece(SequenceLength, newText.length()));
 				
 				pieces.add(pieces.indexOf(piece) + 2, splitPieces[1]);
 			
@@ -131,39 +131,7 @@ public class PieceTable {
 	          }
 	      }
 	    
-    
-
-
-	// TODO: print text from piecetable
-	public void printPieces() {
-		System.out.println("Piece Table Contents");
-		System.out.println("Offset   Length");
-		System.out.println("----------------------------");
-		for (Piece p : pieces) {
-			String text = "";
-				int start = p.offset();
-				int end = start + p.length();
-				if (start >= sequenceBuffer.length()) {
-					// The piece is outside the bounds of the added buffer
-					continue;
-				}
-				if (end > sequenceBuffer.length()) {
-					// The piece goes beyond the end of the added buffer
-					end = sequenceBuffer.length();
-			} 
-				if (start >= sequenceBuffer.length()) {
-					// The piece is outside the bounds of the original buffer
-					continue;
-				}
-				if (end > sequenceBuffer.length()) {
-					// The piece goes beyond the end of the original buffer
-					end = sequenceBuffer.length();
-				}
-				text = sequenceBuffer.substring(start, end);
-			System.out.printf("   %-6d   %-6d  %s%n", p.offset(), p.length(), text);
-		}
-	}
-	
+   
 	public String getSequence() {
 		return (this.sequenceBuffer + " Length: " + this.SequenceLength);
 	}
@@ -178,28 +146,7 @@ public class PieceTable {
 	
 
 	public static void main(String[] args) {
-		//PieceTable pt = new PieceTable("the quick brown fox" + "jumped over the lazy dog");
-		PieceTable pt = new PieceTable("Hello World");
-		pt.getText();
-		
-		// Test inserting at the beginning
-		//pt.insert(0, "111");
-		//System.out.println(pt.getText());
-		//pt.printPieces();
-		//System.out.println(pt.getSequence());
-		//pt.printpt();
-		// Test inserting at the end
-		//pt.insert(pt.SequenceLength, "222");
-		//System.out.println(pt.getText());
-		//pt.printPieces();
 
-		// Test inserting multiple times
-		pt.insert(5, " Everyone");
-		//pt.insert(22, "444");
-		//System.out.println(pt.getText());
-		pt.printpt();
-		System.out.println(pt.getSequence());
-		//System.out.println(pt.getText());
 	
 	}
 }
