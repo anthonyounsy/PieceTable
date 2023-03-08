@@ -17,32 +17,67 @@ public class PieceTableTest {
 	
 	
     @Test
+	
     public void testInsert() {
-        PieceTable table = new PieceTable("Hello, world!");
-        StringBuffer insert1 = new StringBuffer("everyone ");
-        table.insert(6, insert1.toString());
-        assertEquals("Hello, everyone world!", table.getText());
+    	PieceTable table= new PieceTable("Hello, world!");
+    	table.insert(6, "everyone  ");
+    	assertEquals("Hello,everyone   world!",table.getText());
+    			
+    }
+    @Test
+    public void testDelete() {
+//      PieceTable table = new PieceTable("Hello, world!");
+//      table.delete2(0, 5);
+//      assertEquals(", world!", table.getText());
+      
+      PieceTable table = new PieceTable("Hello, world!");
+      table.delete(1, 5);
+      table.getText();
+      assertEquals("H world!", table.getText());
+  }
+    
+    
+    @Test
+    public void testDeleteAll() {
+    	PieceTable table=new PieceTable("Hello, world");
+    	table.delete(0, 6);
+    	assertEquals(" world",table.getText());
     }
     
     @Test
-   public void testDelete() {
-        PieceTable table = new PieceTable("Hello, world!");
- //       table.delete(0, 5);
-        //assertEquals(", world!", table.getText());
+    public void testDeleteEntirePiece() {
+    	PieceTable table = new PieceTable("Hello, world!");
+        table.delete(6,5);
+        assertEquals("orld!",table.getText());
     }
-
+    
+    @Test
+     public void testGet() {
+    	PieceTable table = new PieceTable("Hello, world!");
+    	assertEquals("Hello, world!",table.getText()); 
+    
+    }
+    @Test
+    public void  testInsertAtEnd() {
+    	PieceTable table = new PieceTable("Hello, ");
+    	table.insert(7, "world!");
+    	assertEquals("Hello, world!", table.getText());
+    }
+    
     @Test
     public void testInsertAndDelete() {
         PieceTable table = new PieceTable("Hello, world!");
-        table.insert(7, "everyone ");
-        //table.delete(0, 5);
+        table.insert(8, "everyone ");
+        table.delete(5,6);
         assertEquals("everyone world!", table.getText());
     }
-//
+
     @Test
-    public void testGetText() throws IOException {
-          PieceTable table = new PieceTable("Hello, world!");
-        assertEquals("Hello, world!", table.getText());
+    public void testInsertAtBeginning() {
+    	PieceTable table= new PieceTable("world!");
+    	table.insert(0, "Hello, ");
+    	assertEquals("Hello, world!", table.getText());
     }
-   //
+    
+   
 }
