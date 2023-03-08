@@ -5,6 +5,9 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.junit.Test;
+
+import Archive.PieceTable;
+
 import java.io.*;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -85,6 +88,14 @@ public class PieceTableTest {
 	    table.delete(6,5);
 	    assertEquals("Hello,d!",table.getText());
 	}
+	
+	   @Test 
+	    public void testDeleteAndInsert() {
+	    	PieceTable table = new PieceTable("Hello, world!");
+	        table.delete(0,6);
+	        table.insert(0, "everyone");
+	        assertEquals("everyone world!", table.getText());
+	    }
 	
 	static String getAlphaNumericString(int n)
 	 {
