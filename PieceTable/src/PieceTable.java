@@ -1,6 +1,6 @@
-
 import java.util.Arrays;
 import java.util.ArrayList;
+import java.util.List;
 
 public class PieceTable {
 	private String sequenceBuffer; //stores the Sequence
@@ -46,17 +46,20 @@ public class PieceTable {
 	        int splitIndex = newIndex - piece.offset();
 	        if(splitIndex > 0 && splitIndex < piece.length()) {
 	        	//Update the piece by splitting the pieces at its index
-				Piece[] splitPieces = piece.splitPiece(splitIndex);			
+				Piece[] splitPieces = piece.splitPieceInsert(splitIndex);			
 				Piece p1 = splitPieces[0];
 				Piece p2 = splitPieces[1];
 				System.out.println("offset: "  + p1.offset() +   "length: " + p1.length());
 				System.out.println("offset: "  + p2.offset() +   "length: " + p2.length());
 				//update current piece
-				piece = splitPieces[0];
+				piece.setPiece(splitPieces[0]);
 				//update split node
-				pieces.add(pieces.indexOf(piece) + 1, splitPieces[1]);
+				pieces.add(pieces.indexOf(piece)+1, new Piece(SequenceLength, newText.length()));
+				
+				pieces.add(pieces.indexOf(piece) + 2, splitPieces[1]);
+			
 				//insert new piece
-				pieces.add(new Piece(SequenceLength, newText.length()));
+
 				SequenceLength += newText.length();
 				sequenceBuffer += newText;
 
@@ -72,59 +75,63 @@ public class PieceTable {
 		}
 		return null;
 	}
-	
-	public String getText() {
-		StringBuilder sb = new StringBuilder();
-		int runningTotalLength = 0;
-		for (Piece piece : pieces) {
-				if(pieces.indexOf(piece) == 0) {
-					sb.append(sequenceBuffer.substring(piece.offset(), piece.length()));
-					runningTotalLength += piece.length();
-				}
-				else{
-					sb.append(sequenceBuffer.substring(runningTotalLength, piece.length() + runningTotalLength));
-					runningTotalLength += piece.length();
-				}
 
-		}
-		return sb.toString();
-		
-	}
-	
-	 public void delete(int index, int deletionLength)
-      {
-          if (deletionLength == 0)
-              return;
-          if (index < 0 || index + deletionLength > SequenceLength)
-                throw new IndexOutOfBoundsException("Index out of range");
-          List<Piece> toBeDeleted = new ArrayList<>(); 
-          Piece start = findPiece(index);
-          int deleteOffset = -start.offset();
-          int savedIndex = pieces.indexOf(start);
-          for(int i = pieces.indexOf(start); i < pieces.size(); i++) 
-          {
-              Piece currentPiece = pieces.get(i);
-              deleteOffset += currentPiece.length();
-              toBeDeleted.add(currentPiece);
-              if(deleteOffset >= deletionLength) {
-                  //savedIndex = i;
-                  break;
-              }
-          }
-          pieces.removeAll(toBeDeleted);
-          if(deleteOffset > deletionLength) //EDGECASE: if the end of the delete splits the node at the end of the span.
-          {
-              Piece endEdge = toBeDeleted.get(toBeDeleted.size() - 1); //error
-              Piece[] endEdgeSplit = endEdge.splitPiece(deleteOffset - deletionLength);
-              pieces.add(savedIndex, endEdgeSplit[1]);
-          }
-          
-          if(start.offset() != 0) {
-              Piece startEdge = toBeDeleted.get(0);
-              Piece[] startEdgeSplit = startEdge.splitPiece(deleteOffset - deletionLength);
-              pieces.add(savedIndex, startEdgeSplit[0]);
-          }
-	}
+	   public String getText() {
+	        StringBuilder sb = new StringBuilder();
+	        int runningTotalLength = 0;
+	      
+	        for (Piece piece : pieces) {
+	                if(pieces.indexOf(piece) == 0) {
+	                    sb.append(sequenceBuffer.substring(piece.offset(), piece.length() + piece.offset())) ;
+	                    //runningTotalLength +=piece.offset();
+	             
+	                }
+	                else{
+	                    sb.append(sequenceBuffer.substring(piece.offset(), piece.length() + piece.offset()));
+	                    //runningTotalLength +=piece.offset();
+	                    
+	                }
+	        }
+	        return sb.toString();        
+	    }
+	   
+	     public void delete(int index, int deletionLength)
+	      {
+	          if (deletionLength == 0)
+	              return;
+	          if (index < 0 || index + deletionLength > SequenceLength)
+	                throw new IndexOutOfBoundsException("Index out of range");
+	          List<Piece> toBeDeleted = new ArrayList<>(); 
+	          Piece start = findPiece(index);
+	          int totalNodeLength = -start.offset();
+	          int savedIndex = pieces.indexOf(start);
+	          for(int i = pieces.indexOf(start); i < pieces.size(); i++) 
+	          {
+	              Piece currentPiece = pieces.get(i);
+	              totalNodeLength += currentPiece.length();
+	              toBeDeleted.add(currentPiece);
+	              if(totalNodeLength >= deletionLength) {
+	                  //savedIndex = i;
+	                  break;
+	              }
+	          }
+	          
+	          pieces.removeAll(toBeDeleted);
+	          if(totalNodeLength > deletionLength) //EDGECASE: if the end of the delete splits the node at the end of the span.
+	          {
+	              Piece endEdge = toBeDeleted.get(toBeDeleted.size() - 1); //error
+	              Piece[] endEdgeSplit = endEdge.splitPiece(totalNodeLength - (totalNodeLength - deletionLength) + (index - savedIndex));
+	              pieces.add(savedIndex, endEdgeSplit[1]);
+	          }
+	          
+	          if((start.offset() - index) != 0) {
+	              Piece startEdge = toBeDeleted.get(0);
+	              Piece[] startEdgeSplit = startEdge.splitPiece(index - savedIndex);
+	              pieces.add(savedIndex, startEdgeSplit[0]);
+	          }
+	      }
+	    
+    
 
 
 	// TODO: print text from piecetable
@@ -161,18 +168,26 @@ public class PieceTable {
 		return (this.sequenceBuffer + " Length: " + this.SequenceLength);
 	}
 	
+	private void printpt() {
+		for(Piece p: pieces) {
+			
+			System.out.println("Piece: " +pieces.indexOf(p)  + "   offset: "  + p.offset() +   "length: " + p.length());
+		}
+	}
+	
 	
 
 	public static void main(String[] args) {
 		//PieceTable pt = new PieceTable("the quick brown fox" + "jumped over the lazy dog");
 		PieceTable pt = new PieceTable("Hello World");
+		pt.getText();
 		
 		// Test inserting at the beginning
 		//pt.insert(0, "111");
 		//System.out.println(pt.getText());
 		//pt.printPieces();
-		System.out.println(pt.getSequence());
-
+		//System.out.println(pt.getSequence());
+		//pt.printpt();
 		// Test inserting at the end
 		//pt.insert(pt.SequenceLength, "222");
 		//System.out.println(pt.getText());
@@ -182,7 +197,7 @@ public class PieceTable {
 		pt.insert(5, " Everyone");
 		//pt.insert(22, "444");
 		//System.out.println(pt.getText());
-		pt.printPieces();
+		pt.printpt();
 		System.out.println(pt.getSequence());
 		//System.out.println(pt.getText());
 	
