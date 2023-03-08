@@ -48,7 +48,7 @@ public class PieceTableTest {
     public void testDeleteEntirePiece() {
     	PieceTable table = new PieceTable("Hello, world!");
         table.delete(6,5);
-        assertEquals("orld!",table.getText());
+        assertEquals("Hello,d!",table.getText());
     }
     
     @Test
