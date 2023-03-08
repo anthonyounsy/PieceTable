@@ -1,3 +1,6 @@
+import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -82,6 +85,59 @@ public class PieceTableTest {
 	    table.delete(6,5);
 	    assertEquals("Hello,d!",table.getText());
 	}
+	
+	static String getAlphaNumericString(int n)
+	 {
+	 
+	  // choose a Character random from this String
+	  String AlphaNumericString = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+	         + "0123456789"
+	         + "abcdefghijklmnopqrstuvxyz";
+	 
+	  // create StringBuffer size of AlphaNumericString
+	  StringBuilder sb = new StringBuilder(n);
+	 
+	  for (int i = 0; i < n; i++) {
+	 
+	   // generate a random number between
+	   // 0 to AlphaNumericString variable length
+	   int index
+	    = (int)(AlphaNumericString.length()
+	      * Math.random());
+	 
+	   // add Character one by one in end of sb
+	   sb.append(AlphaNumericString
+	      .charAt(index));
+	  }
+	 
+	  return sb.toString();
+	 }
+	
+	public class PerformanceTest {
+		  private static final long MEGABYTE = 1024L * 1024L;
+
+		  public static long bytesToMegabytes(long bytes) {
+		    return bytes / MEGABYTE;
+		  }
+
+		  public static void main(String[] args) {
+			  PieceTable table = new PieceTable("Hello, world!");
+	
+		   ArrayList<Piece>test = new ArrayList<Piece>();
+		    for (int i = 0; i <= 100; i++) {
+		      table.insert(8, getAlphaNumericString(5));
+		    }
+		    // Get the Java runtime
+		    Runtime runtime = Runtime.getRuntime();
+		    // Run the garbage collector
+		    runtime.gc();
+		    // Calculate the used memory
+		    long memory = runtime.totalMemory() - runtime.freeMemory();
+		    System.out.println("Used memory is bytes: " + memory);
+		    System.out.println("Used memory is megabytes: "
+		        + bytesToMegabytes(memory));
+		  }
+		} 
     
    
 }
