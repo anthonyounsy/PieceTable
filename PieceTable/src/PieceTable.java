@@ -29,7 +29,7 @@ public class PieceTable {
 		}
 		if(newIndex == SequenceLength) {
 			//Insert at the end of the file
-			pieces.add(new Piece(SequenceLength, newText.length()));
+			pieces.add(new Piece(SequenceLength, newText.length()-1));
 			sequenceBuffer += newText;
 			SequenceLength += newText.length();
 		}
@@ -46,7 +46,7 @@ public class PieceTable {
 	        int splitIndex = newIndex - piece.offset();
 	        if(splitIndex > 0 && splitIndex < piece.length()) {
 	        	//Update the piece by splitting the pieces at its index
-				Piece[] splitPieces = piece.splitPieceInsert(splitIndex);			
+				Piece[] splitPieces = piece.splitPiece(splitIndex);			
 				Piece p1 = splitPieces[0];
 				Piece p2 = splitPieces[1];
 				System.out.println("offset: "  + p1.offset() +   "length: " + p1.length());
@@ -54,7 +54,7 @@ public class PieceTable {
 				//update current piece
 				piece.setPiece(splitPieces[0]);
 				//update split node
-				pieces.add(pieces.indexOf(piece)+1, new Piece(SequenceLength, newText.length()));
+				pieces.add(pieces.indexOf(piece)+1, new Piece(SequenceLength, newText.length()-2));
 				
 				pieces.add(pieces.indexOf(piece) + 2, splitPieces[1]);
 			
