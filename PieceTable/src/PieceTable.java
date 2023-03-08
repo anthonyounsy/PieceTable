@@ -47,10 +47,8 @@ public class PieceTable {
 	        if(splitIndex > 0 && splitIndex < piece.length()) {
 	        	//Update the piece by splitting the pieces at its index
 				Piece[] splitPieces = piece.splitPiece(splitIndex);			
-				Piece p1 = splitPieces[0];
-				Piece p2 = splitPieces[1];
-				System.out.println("offset: "  + p1.offset() +   "length: " + p1.length());
-				System.out.println("offset: "  + p2.offset() +   "length: " + p2.length());
+	
+				
 				//update current piece
 				piece.setPiece(splitPieces[0]);
 				//update split node
@@ -78,13 +76,10 @@ public class PieceTable {
 
 	   public String getText() {
 	        StringBuilder sb = new StringBuilder();
-	        int runningTotalLength = 0;
 	      
 	        for (Piece piece : pieces) {
 	                if(pieces.indexOf(piece) == 0) {
 	                    sb.append(sequenceBuffer.substring(piece.offset(), piece.length() + piece.offset())) ;
-	                    //runningTotalLength +=piece.offset();
-	             
 	                }
 	                else{
 	                    sb.append(sequenceBuffer.substring(piece.offset(), piece.length() + piece.offset()));
@@ -131,7 +126,8 @@ public class PieceTable {
 	          }
 	      }
 	    
-   
+    
+	
 	public String getSequence() {
 		return (this.sequenceBuffer + " Length: " + this.SequenceLength);
 	}
@@ -146,7 +142,8 @@ public class PieceTable {
 	
 
 	public static void main(String[] args) {
-
+	
+		
 	
 	}
 }
