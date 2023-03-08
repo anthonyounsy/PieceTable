@@ -19,17 +19,32 @@ public class Piece {
     public int length() {
         return length;
     }
+    
 
     public void setOffset(int index) {
         this.offset = index;
     }
     
+
+    
     public Piece[] splitPiece(int splitOffset) {
-        Piece prevPiece = new Piece(offset, splitOffset - offset - 1);
-        Piece newPiece = new Piece(splitOffset, length);
+        Piece newPiece = new Piece(splitOffset, length-splitOffset);
+        Piece prevPiece = new Piece(offset, splitOffset - offset);
         Piece[] split = {prevPiece, newPiece};
         return split;
     }
+    /**
+    public Piece[] splitPieceInsert(int splitOffset) {
+    	Piece newPiece = new Piece(splitOffset, length-splitOffset);
+        Piece prevPiece = new Piece(offset, splitOffset - offset);       
+        
+        Piece[] split = {prevPiece, newPiece};
+        return split;
+    }
+**/
+	public void setPiece(Piece newPiece) {
+		// TODO Auto-generated method stub
+		this.offset = newPiece.offset();
+		this.length = newPiece.length();
+	}
 }
-    
- 
