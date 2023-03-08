@@ -24,6 +24,8 @@ public class PieceTable {
 		if (newIndex == 0) {
 			// Inserting at the beginning of the document
 			pieces.add(0, new Piece( 0, newText.length()));
+			Piece nextPiece = pieces.get(1);
+			nextPiece.setOffset(newText.length());
 			SequenceLength += newText.length();
 			sequenceBuffer = newText + sequenceBuffer;
 		}
@@ -38,11 +40,11 @@ public class PieceTable {
 			//Find the piece that contains the index
 			Piece piece = findPiece(newIndex);
 			//if the new piece is inserted at the end of an existing node
-			if(piece.length() == newIndex) {
-				pieces.add(new Piece(SequenceLength, newText.length()));
-				SequenceLength += newText.length();
-				sequenceBuffer += newText;
-			}
+			//if(piece.length() == newIndex) {
+				//pieces.add(new Piece(SequenceLength, newText.length()));
+				//SequenceLength += newText.length();
+				//sequenceBuffer += newText;
+			//}
 	        int splitIndex = newIndex - piece.offset();
 	        if(splitIndex > 0 && splitIndex < piece.length()) {
 	        	//Update the piece by splitting the pieces at its index
@@ -78,14 +80,7 @@ public class PieceTable {
 	        StringBuilder sb = new StringBuilder();
 	      
 	        for (Piece piece : pieces) {
-	                if(pieces.indexOf(piece) == 0) {
-	                    sb.append(sequenceBuffer.substring(piece.offset(), piece.length() + piece.offset())) ;
-	                }
-	                else{
 	                    sb.append(sequenceBuffer.substring(piece.offset(), piece.length() + piece.offset()));
-	                    //runningTotalLength +=piece.offset();
-	                    
-	                }
 	        }
 	        return sb.toString();        
 	    }
