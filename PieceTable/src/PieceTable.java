@@ -28,42 +28,45 @@ public class PieceTable {
 			nextPiece.setOffset(newText.length());
 			SequenceLength += newText.length();
 			sequenceBuffer = newText + sequenceBuffer;
+			return;
 		}
 		if(newIndex == SequenceLength) {
 			//Insert at the end of the file
 			pieces.add(new Piece(SequenceLength, newText.length()));
 			sequenceBuffer += newText;
 			SequenceLength += newText.length();
+			return;
 		}
-		
 		else {
 			//Find the piece that contains the index
 			Piece piece = findPiece(newIndex);
-			//if the new piece is inserted at the end of an existing node
-			//if(piece.length() == newIndex) {
-				//pieces.add(new Piece(SequenceLength, newText.length()));
-				//SequenceLength += newText.length();
-				//sequenceBuffer += newText;
-			//}
+
 	        int splitIndex = newIndex - piece.offset();
+	        System.out.println(splitIndex);
+	        System.out.println(piece.offset());
 	        if(splitIndex > 0 && splitIndex < piece.length()) {
 	        	//Update the piece by splitting the pieces at its index
-				Piece[] splitPieces = piece.splitPiece(splitIndex);			
-	
-				
+				Piece[] splitPieces = piece.splitPiece(splitIndex);		
+			
 				//update current piece
 				piece.setPiece(splitPieces[0]);
-				//update split node
+				//update split node		
 				pieces.add(pieces.indexOf(piece)+1, new Piece(SequenceLength, newText.length()));
-				
 				pieces.add(pieces.indexOf(piece) + 2, splitPieces[1]);
 			
 				//insert new piece
+				SequenceLength += newText.length();
+				sequenceBuffer += newText;
+				return;
 
+	        }
+	        else{
+	        	//if new piece is not at the beginning of the text or end, or in the middle of a piece
+				pieces.add(pieces.indexOf(piece)-1, new Piece(SequenceLength, newText.length()));
 				SequenceLength += newText.length();
 				sequenceBuffer += newText;
 
-	        }
+			}
 		}
 	}
 
@@ -78,48 +81,48 @@ public class PieceTable {
 
 	   public String getText() {
 	        StringBuilder sb = new StringBuilder();
-	      
-	        for (Piece piece : pieces) {
-	                    sb.append(sequenceBuffer.substring(piece.offset(), piece.length() + piece.offset()));
+	 
+	        for (Piece piece : pieces) { 	
+	                    sb.append(sequenceBuffer.substring(piece.offset(),piece.offset()+piece.length()));
+
 	        }
 	        return sb.toString();        
 	    }
 	   
-	     public void delete(int index, int deletionLength)
-	      {
-	          if (deletionLength == 0)
-	              return;
-	          if (index < 0 || index + deletionLength > SequenceLength)
-	                throw new IndexOutOfBoundsException("Index out of range");
-	          List<Piece> toBeDeleted = new ArrayList<>(); 
-	          Piece start = findPiece(index);
-	          int totalNodeLength = -start.offset();
-	          int savedIndex = pieces.indexOf(start);
-	          for(int i = pieces.indexOf(start); i < pieces.size(); i++) 
-	          {
-	              Piece currentPiece = pieces.get(i);
-	              totalNodeLength += currentPiece.length();
-	              toBeDeleted.add(currentPiece);
-	              if(totalNodeLength >= deletionLength) {
-	                  //savedIndex = i;
-	                  break;
-	              }
-	          }
-	          
-	          pieces.removeAll(toBeDeleted);
-	          if(totalNodeLength > deletionLength) //EDGECASE: if the end of the delete splits the node at the end of the span.
-	          {
-	              Piece endEdge = toBeDeleted.get(toBeDeleted.size() - 1); //error
-	              Piece[] endEdgeSplit = endEdge.splitPiece(totalNodeLength - (totalNodeLength - deletionLength) + (index - savedIndex));
-	              pieces.add(savedIndex, endEdgeSplit[1]);
-	          }
-	          
-	          if((start.offset() - index) != 0) {
-	              Piece startEdge = toBeDeleted.get(0);
-	              Piece[] startEdgeSplit = startEdge.splitPiece(index - savedIndex);
-	              pieces.add(savedIndex, startEdgeSplit[0]);
-	          }
-	      }
+	   public void delete(int index, int deletionLength)
+       {
+           if (index < 0 || index + deletionLength > SequenceLength)
+                 throw new IndexOutOfBoundsException("Index out of range");
+           List<Piece> toBeDeleted = new ArrayList<>(); 
+           Piece start = findPiece(index);
+           int totalNodeLength = -start.offset();
+           int savedIndex = pieces.indexOf(start);
+           for(int i = pieces.indexOf(start); i < pieces.size(); i++) 
+           {
+               Piece currentPiece = pieces.get(i);
+               totalNodeLength += currentPiece.length();
+               toBeDeleted.add(currentPiece);
+               if(totalNodeLength >= deletionLength) {
+                   //savedIndex = i;
+                   break;
+               }
+           }
+           
+           pieces.removeAll(toBeDeleted);
+           if(totalNodeLength > deletionLength) //EDGECASE: if the end of the delete splits the node at the end of the span.
+           {
+               Piece endEdge = toBeDeleted.get(toBeDeleted.size() - 1); //error
+               Piece[] endEdgeSplit = endEdge.splitPiece(totalNodeLength - (totalNodeLength - deletionLength) + (index - savedIndex));
+               pieces.add(savedIndex, endEdgeSplit[1]);
+           }
+           
+           if((start.offset() - index) != 0) {
+               Piece startEdge = toBeDeleted.get(0);
+               Piece[] startEdgeSplit = startEdge.splitPiece(index - savedIndex);
+               pieces.add(savedIndex, startEdgeSplit[0]);
+           }
+       }
+     
 	    
     
 	
@@ -127,7 +130,7 @@ public class PieceTable {
 		return (this.sequenceBuffer + " Length: " + this.SequenceLength);
 	}
 	
-	private void printpt() {
+	public void printpt() {
 		for(Piece p: pieces) {
 			
 			System.out.println("Piece: " +pieces.indexOf(p)  + "   offset: "  + p.offset() +   "length: " + p.length());
@@ -137,8 +140,7 @@ public class PieceTable {
 	
 
 	public static void main(String[] args) {
-	
-		
+
 	
 	}
 }
