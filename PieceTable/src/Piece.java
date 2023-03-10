@@ -1,7 +1,7 @@
 public class Piece {
    
     private int offset; //start of the piece in buffer
-    private int length; //length of the piece in buffer
+    int length; //length of the piece in buffer
 
     //Constructor
     public Piece(int offset, int length) {
@@ -28,20 +28,19 @@ public class Piece {
 
     
     public Piece[] splitPiece(int splitOffset) {
-        Piece newPiece = new Piece(splitOffset, length-splitOffset);
-        Piece prevPiece = new Piece(offset, splitOffset - offset);
-        Piece[] split = {prevPiece, newPiece};
-        return split;
+    	if(splitOffset - offset >= 0) {
+    		 	Piece newPiece = new Piece(splitOffset, length-splitOffset);
+    	        Piece prevPiece = new Piece(offset, splitOffset - offset);
+    	        Piece[] split = {prevPiece, newPiece};
+    	        return split;
+    	}
+    	else {
+		 	throw new IllegalArgumentException("Cannot have negative split on splitoffset:" + splitOffset +" offset:"+ offset);
+    	}
+    	
     }
-    /**
-    public Piece[] splitPieceInsert(int splitOffset) {
-    	Piece newPiece = new Piece(splitOffset, length-splitOffset);
-        Piece prevPiece = new Piece(offset, splitOffset - offset);       
-        
-        Piece[] split = {prevPiece, newPiece};
-        return split;
-    }
-**/
+
+
 	public void setPiece(Piece newPiece) {
 		// TODO Auto-generated method stub
 		this.offset = newPiece.offset();
